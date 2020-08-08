@@ -630,9 +630,11 @@ set_pglocale_pgservice(const char *argv0, const char *app)
 																 * PGLOCALEDIR */
 
 	/* don't set LC_ALL in the backend */
+	//- 如果 postgres 主程序，那么不设定 LC_ALL 的语言设置
 	if (strcmp(app, PG_TEXTDOMAIN("postgres")) != 0)
 		setlocale(LC_ALL, "");
 
+	//- 程序不存在于执行路境内退出出
 	if (find_my_exec(argv0, my_exec_path) < 0)
 		return;
 
@@ -641,6 +643,7 @@ set_pglocale_pgservice(const char *argv0, const char *app)
 	bindtextdomain(app, path);
 	textdomain(app);
 
+	//- 如果环境变量 PGLOCALEDIR 不存在，那么从 etc 路径回写该变量
 	if (getenv("PGLOCALEDIR") == NULL)
 	{
 		/* set for libpq to use */
@@ -650,6 +653,7 @@ set_pglocale_pgservice(const char *argv0, const char *app)
 	}
 #endif
 
+	//- 如果环境变量 PGSYSCONFDIR 不存在，那么从 etc 路径会回写该变量
 	if (getenv("PGSYSCONFDIR") == NULL)
 	{
 		get_etc_path(my_exec_path, path);

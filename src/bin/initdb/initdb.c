@@ -1317,6 +1317,7 @@ bootstrap_template1(char *short_version)
 	if (debug)
 		talkargs = "-d 5";
 
+	//- 读入包含生成指令的 bki 文件
 	bki_lines = readfile(bki_file);
 
 	/* Check that bki file appears to be of the right version */
@@ -1382,6 +1383,7 @@ bootstrap_template1(char *short_version)
 
 	PG_CMD_OPEN;
 
+	//- 对于已准备好的 bki 行，开始逐一执行
 	for (line = bki_lines; *line != NULL; line++)
 	{
 		PG_CMD_PUTS(*line);
@@ -2069,6 +2071,7 @@ trapsig(int signum)
 /*
  * call exit_nicely() if we got a signal, or else output "ok".
  */
+//- 一个通用的结果处理函数，用于当出现外界不可控异常时错误推出，回调
 static void
 check_ok(void)
 {
@@ -2456,6 +2459,7 @@ usage(const char *progname)
 	printf(_("\nReport bugs to <pgsql-bugs@postgresql.org>.\n"));
 }
 
+//- 主函数
 int
 main(int argc, char *argv[])
 {
@@ -2518,7 +2522,10 @@ main(int argc, char *argv[])
 		"pg_stat_tmp"
 	};
 
+	//- 获取进程名称，用于在出错退出时进行回报
+	//- 注意到 progname 指向的内存是在 ger_progname 中分配的，且本程序并非长程运行，因此未特异性的搭配析构函数
 	progname = get_progname(argv[0]);
+	//- 根据运行的目标程序 set 对应的环境变量
 	set_pglocale_pgservice(argv[0], PG_TEXTDOMAIN("initdb"));
 
 	if (argc > 1)
@@ -2613,6 +2620,7 @@ main(int argc, char *argv[])
 
 
 	/* Non-option argument specifies data directory */
+	//- The last option，从最后一个参数 get pg_data 的路径
 	if (optind < argc)
 	{
 		pg_data = xstrdup(argv[optind]);
@@ -2673,6 +2681,7 @@ main(int argc, char *argv[])
 		exit(1);
 	}
 
+	//- 如果未输入 pgdata 那么使用环境变量中的默认路径
 	if (strlen(pg_data) == 0)
 	{
 		pgdenv = getenv("PGDATA");
@@ -2746,6 +2755,7 @@ main(int argc, char *argv[])
 	 * need quotes otherwise on Windows because paths there are most likely to
 	 * have embedded spaces.
 	 */
+	 //- push PGDATA to env
 	pgdenv = pg_malloc(8 + strlen(pg_data));
 	sprintf(pgdenv, "PGDATA=%s", pg_data);
 	putenv(pgdenv);
@@ -2953,12 +2963,14 @@ main(int argc, char *argv[])
 
 	printf("\n");
 
+	//- 限制创建文件的权限
 	umask(077);
 
 	/*
 	 * now we are starting to do real work, trap signals so we can clean up
 	 */
-
+//- 信号代理，当收到外界的终止请求时注册的执行流
+//- 捕捉到信号时置位 flag 变量
 	/* some of these are not valid on Windows */
 #ifdef SIGHUP
 	pqsignal(SIGHUP, trapsig);
@@ -3129,16 +3141,21 @@ main(int argc, char *argv[])
 	check_ok();
 
 	/* Top level PG_VERSION is checked by bootstrapper, so make it first */
+	//- 将 POSTGRES 版本写入文件
 	set_short_version(short_version, NULL);
 
 	/* Select suitable configuration settings */
+	//- 准备空配置文件 postgresql.conf
 	set_null_conf();
+	//- 进行性能测试以生成配置文件，如 n_connections 等参数需要根据运行时环境确认最大值
 	test_config_settings();
 
 	/* Now create all the text config files */
+	//- 生成 config postgresql.conf pg_hba.conf pg_ident.conf
 	setup_config();
 
 	/* Bootstrap template1 */
+	//- 构造首个表 template1， oid == 1
 	bootstrap_template1(short_version);
 
 	/*
@@ -3148,28 +3165,40 @@ main(int argc, char *argv[])
 
 	/* Create the stuff we don't need to use bootstrap mode for */
 
+	//- 构建初始安全配置，加一系列的 trigger
 	setup_auth();
 	if (pwprompt || pwfilename)
+		//- 提示用户或从文件读取并写入密码
 		get_set_pwd();
 
+	//- 将依赖写入 pg_depend 表
 	setup_depend();
 
+	//- 创建系统视图
 	setup_sysviews();
 
+	//- 创建对象描述
 	setup_description();
 
+	//- 创建转换函数
 	setup_conversion();
 
+	//- 创建字典
 	setup_dictionary();
 
+	//- 为内置对象的操作创建全线
 	setup_privileges();
 
+	//- 创建 information_schema
 	setup_schema();
 
+	//- VACUMM, 完成对 template1 的操作
 	vacuum_db();
 
+	//- 复制生成 template0
 	make_template0();
 
+	//- 复制生成 postgres
 	make_postgres();
 
 	if (authwarning != NULL)

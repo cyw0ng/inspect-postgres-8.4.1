@@ -391,6 +391,7 @@ get_progname(const char *argv0)
 	const char *nodir_name;
 	char	   *progname;
 
+	//- strip 至最后一个层级
 	nodir_name = last_dir_separator(argv0);
 	if (nodir_name)
 		nodir_name++;

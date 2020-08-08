@@ -1,0 +1,31 @@
+# Chapter 02 - PostgreSQL 的体系结构
+
+- Postgres 主要模块分化
+    - 连接管理系统：控制外部链接，接受来自 ODBC/JDBC/psql 等连接对象的请求
+    - 编译执行系统：完成请求向 procedure 的转化工作
+        - DDL 编译器
+        - 查询编译器
+        - 查询执行器
+    - 事务系统：一致性控制的核心
+        - 事务管理器
+        - 日志管理器
+        - 并发控制
+        - 锁管理器
+    - 存储管理系统：对 OS 的主要接口和存储实体的抽象层
+        - 索引管理器
+        - 内存管理器
+        - 外存管理器
+    - 系统表：数据字典，维护系统级特性
+        - pg_namespace：存储 namespace，每个 namespace 间互相隔离，维护 Database-Schema-Table-Attribute 的层级属性
+            - 当访问对象时，将按照如下的层级结构进行搜索
+                - 特殊命名空间，仅用于创建 Schema
+                - 临时表
+                - 系统表
+            - namespace 中的每一个 tuple 对应一个 OID，用于进行唯一标示
+        - pg_tablespace：存储 tablespace，即表空间信息，用于辅助实施在真实 backend 设备上存放时的 layout
+            - 通过控制表空间的区分，将数据中的表分布至不同的路径
+        - pg_database：存放集群中数据库的信息，整个集群范围内共享
+        - pg_class：存储表及类似结构的信息，包括索引、序列、视复合数据类型等
+        - pg_type：类型表
+        - pg_attribute：存储表的属性信息
+        - pg_index：存储索引信息

@@ -29,3 +29,5 @@
         - pg_type：类型表
         - pg_attribute：存储表的属性信息
         - pg_index：存储索引信息
+- Postgresql 进程结构
+    - 整体进程结构中主题为守护进程 postmaster 和服务进程 postgres，本质上都是 Postgres 程序形成的，处于不同的分支，postmaster 负责集群的起止，监听用户端请求，分配服务进程 postgres，服务进程执行客户端发送的命令，调动各模块完成目标操作

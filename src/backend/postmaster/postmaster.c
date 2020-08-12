@@ -476,6 +476,9 @@ PostmasterMain(int argc, char *argv[])
 	/*
 	 * Fire up essential subsystems: memory management
 	 */
+	//- 创建顶层内存分配上下文，创建 Top 和 Error
+	//- Top 直至程序退出才会释放
+	//- Error 用于错误恢复处理，错误处理后重设
 	MemoryContextInit();
 
 	/*
@@ -497,6 +500,7 @@ PostmasterMain(int argc, char *argv[])
 	/*
 	 * Options setup
 	 */
+	//- 设置 GUC 参数初始值
 	InitializeGUCOptions();
 
 	opterr = 1;
@@ -506,6 +510,7 @@ PostmasterMain(int argc, char *argv[])
 	 * tcop/postgres.c (the option sets should not conflict) and with the
 	 * common help() function in main/main.c.
 	 */
+	//- 从 getopt list 获取一系列参数，并将其转化为对应的变量
 	while ((opt = getopt(argc, argv, "A:B:c:D:d:EeFf:h:ijk:lN:nOo:Pp:r:S:sTt:W:-:")) != -1)
 	{
 		switch (opt)
@@ -2076,6 +2081,7 @@ SIGHUP_handler(SIGNAL_ARGS)
 /*
  * pmdie -- signal handler for processing various postmaster signals.
  */
+//- Die hard
 static void
 pmdie(SIGNAL_ARGS)
 {

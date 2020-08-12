@@ -2897,6 +2897,7 @@ get_guc_variables(void)
  * re-executed after startup (eg, we could allow loadable modules to
  * add vars, and then we'd need to re-sort).
  */
+//- 从各类型的参数列表拼接全局参数列表
 void
 build_guc_variables(void)
 {
@@ -3206,6 +3207,7 @@ guc_name_compare(const char *namea, const char *nameb)
  * Note that we cannot read the config file yet, since we have not yet
  * processed command-line switches.
  */
+//- Grand Unified Configuration -- 全局配置
 void
 InitializeGUCOptions(void)
 {
@@ -3251,7 +3253,7 @@ InitializeGUCOptions(void)
 	 * environment variables.  Process those settings.	NB: if you add or
 	 * remove anything here, see also ProcessConfigFile().
 	 */
-
+	//- 通过环境变量设定某些启动参数
 	env = getenv("PGPORT");
 	if (env != NULL)
 		SetConfigOption("port", env, PGC_POSTMASTER, PGC_S_ENV_VAR);
@@ -3269,6 +3271,7 @@ InitializeGUCOptions(void)
 	 * the same.  If we can identify the platform stack depth rlimit, increase
 	 * default stack depth setting up to whatever is safe (but at most 2MB).
 	 */
+	//- 设定栈深度限制，以防爆栈
 	stack_rlimit = get_stack_depth_rlimit();
 	if (stack_rlimit > 0)
 	{
@@ -3289,13 +3292,18 @@ InitializeGUCOptions(void)
 /*
  * Initialize one GUC option variable to its compiled-in default.
  */
+//- 设定默认值
 static void
 InitializeOneGUCOption(struct config_generic * gconf)
 {
+	//- 状态为 0
 	gconf->status = 0;
+	//- 重设源为 DEFAULT
 	gconf->reset_source = PGC_S_DEFAULT;
+	//- 设定源为 DEFAULT
 	gconf->source = PGC_S_DEFAULT;
 	gconf->stack = NULL;
+	//- 源于未设定的 sourcefile
 	gconf->sourcefile = NULL;
 	gconf->sourceline = 0;
 
@@ -3306,10 +3314,12 @@ InitializeOneGUCOption(struct config_generic * gconf)
 				struct config_bool *conf = (struct config_bool *) gconf;
 
 				if (conf->assign_hook)
+					//- 通过 assign_hook 设定了 boot_val
 					if (!(*conf->assign_hook) (conf->boot_val, true,
 											   PGC_S_DEFAULT))
 						elog(FATAL, "failed to initialize %s to %d",
 							 conf->gen.name, (int) conf->boot_val);
+				//- 将 boot_val 写为 val 和 reset_val 即完成了赋值过程
 				*conf->variable = conf->reset_val = conf->boot_val;
 				break;
 			}
@@ -3411,6 +3421,8 @@ InitializeOneGUCOption(struct config_generic * gconf)
  * Returns true on success; on failure, prints a suitable error message
  * to stderr and returns false.
  */
+//- 从 postgres.conf 读取参数
+//- 可能使用 -D configdir 传入目标路径
 bool
 SelectConfigFiles(const char *userDoption, const char *progname)
 {
@@ -3464,6 +3476,7 @@ SelectConfigFiles(const char *userDoption, const char *progname)
 		return false;
 	}
 
+	//- 处理配置文件
 	ProcessConfigFile(PGC_POSTMASTER);
 
 	/*

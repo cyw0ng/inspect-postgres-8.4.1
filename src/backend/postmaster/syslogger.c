@@ -448,6 +448,7 @@ SysLoggerMain(int argc, char *argv[])
 /*
  * Postmaster subroutine to start a syslogger subprocess.
  */
+//- stderr direction
 int
 SysLogger_Start(void)
 {

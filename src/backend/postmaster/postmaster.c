@@ -1038,6 +1038,7 @@ PostmasterMain(int argc, char *argv[])
 	/*
 	 * We're ready to rock and roll...
 	 */
+	//- Postmaster 准备完成，开始启动服务
 	StartupPID = StartupDataBase();
 	Assert(StartupPID != 0);
 	pmState = PM_STARTUP;
@@ -1305,6 +1306,7 @@ pmdaemonize(void)
 /*
  * Main idle loop of postmaster
  */
+//- Main loop of Postmaster
 static int
 ServerLoop(void)
 {
@@ -2031,8 +2033,9 @@ reset_shared(int port)
 /*
  * SIGHUP -- reread config files, and tell children to do same
  */
+//- SIGHUP 用于重新 load 文件
 static void
-SIGHUP_handler(SIGNAL_ARGS)
+load_hba(SIGNAL_ARGS)
 {
 	int			save_errno = errno;
 
@@ -2043,6 +2046,7 @@ SIGHUP_handler(SIGNAL_ARGS)
 		ereport(LOG,
 				(errmsg("received SIGHUP, reloading configuration files")));
 		ProcessConfigFile(PGC_SIGHUP);
+		//- 递归向被纳管的进程发送 SIGHUP
 		SignalChildren(SIGHUP);
 		if (StartupPID != 0)
 			signal_child(StartupPID, SIGHUP);
@@ -2211,6 +2215,7 @@ pmdie(SIGNAL_ARGS)
 /*
  * Reaper -- signal handler to cleanup after a child process dies.
  */
+//- 收割退出的子线程
 static void
 reaper(SIGNAL_ARGS)
 {

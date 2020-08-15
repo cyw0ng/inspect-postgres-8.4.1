@@ -2738,6 +2738,7 @@ AutoVacuumingActive(void)
  *
  * All we do here is annoy the user if he got it wrong.
  */
+//- AUTO VACUMM 用于自动添加 VACUMM 至数据库操作
 void
 autovac_init(void)
 {

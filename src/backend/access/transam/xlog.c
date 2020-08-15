@@ -2002,6 +2002,7 @@ XLogFlush(XLogRecPtr record)
  *
  * This routine is invoked periodically by the background walwriter process.
  */
+//- 预写式日志写入
 void
 XLogBackgroundFlush(void)
 {
@@ -8004,6 +8005,7 @@ StartupProcShutdownHandler(SIGNAL_ARGS)
 }
 
 /* Main entry point for startup process */
+//- 启动数据库
 void
 StartupProcessMain(void)
 {

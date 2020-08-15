@@ -84,6 +84,7 @@ static void WalShutdownHandler(SIGNAL_ARGS);
  * This is invoked from BootstrapMain, which has already created the basic
  * execution environment, but not enabled signals yet.
  */
+//- 预写式日志
 void
 WalWriterMain(void)
 {

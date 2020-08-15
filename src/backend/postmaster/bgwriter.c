@@ -194,6 +194,7 @@ static void ReqShutdownHandler(SIGNAL_ARGS);
  * This is invoked from BootstrapMain, which has already created the basic
  * execution environment, but not enabled signals yet.
  */
+//- BgWriter Entry Point 实际的脏页回写进程
 void
 BackgroundWriterMain(void)
 {

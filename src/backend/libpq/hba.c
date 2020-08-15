@@ -1301,6 +1301,7 @@ clean_hba_list(List *lines)
  * the old list is kept in place and false is returned. Only if the whole file
  * parses Ok is the list replaced, and the function returns true.
  */
+//- load host based auth 配置
 bool
 load_hba(void)
 {

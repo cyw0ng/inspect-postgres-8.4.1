@@ -289,6 +289,7 @@ static void pgstat_recv_funcpurge(PgStat_MsgFuncpurge *msg, int len);
  *	disabled.
  * ----------
  */
+//- 启动 PgStat
 void
 pgstat_init(void)
 {
